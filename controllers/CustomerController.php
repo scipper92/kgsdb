@@ -42,13 +42,32 @@ class CustomerController extends \yii\web\Controller
     {
         $model = new Customer();
         if( $model->load(\Yii::$app->request->post()) && $model->validate()){
-            $text = $model->formShape($model->queryBase());
+        //    $model->queryBase();
+            $fname = $model->formShape($model->queryBase());
+            $chop_len  = 1024*256;
+            $len = filesize($fname);
+            $fd = fopen($fname,'r');/*
+            header("Pragma: public");
+            header("Expires: -1");
+            header("Cache-Control: public, must-revalidate, post-check=0, pre-check=0");*/
             header("Content-Description: File Transfer");
             header("Content-Type: application/octet-stream" );
             header('Content-Disposition: attachment; filename="KGS_base.kml"');
-            header('Content-length: '.strlen($text));
-            echo $text;
-            ob_flush();
+        /*    if($len>$chop_len) {
+                header('HTTP/1.1 206 Partial Content');
+                header('Content-Range: bytes 0-' . ($chop_len - 1) . '/' . $len);
+                header('Content-length: '.$chop_len);
+            } else {*/
+            header('Content-length: ' . $len);
+          //  }
+            header('Accept-Ranges: bytes');
+            while(!feof($fd)){
+                echo fread($fd,$chop_len);
+                ob_flush();
+                //flush();
+            }
+            fclose($fd);
+            unlink($fname);/**/
             return $this->refresh();
         }
         return $this->render('index',['model'=>$model]);

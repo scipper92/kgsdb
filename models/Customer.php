@@ -33,73 +33,71 @@ class Customer extends Model
     }
 
     public function queryBase(){
-        $coor = Coordinates::find()->where(['or',['<=','SW_lat',$this->top],['<=','SE_lat',$this->top]]);
-        $coor->andWhere(['or',['>=','NE_lat',$this->bottom],['>=','NW_lat',$this->bottom]]);
-        $coor->andWhere(['or',['>=','NE_lng',$this->left],['>=','SE_lng',$this->left]]);
-        $coor->andWhere(['or',['<=','NW_lng',$this->right],['>=','SW_lng',$this->right]]);
-        $coor = $coor->all();
         $qlook = [];
         if($this->HR && !$this->MR) {
-            foreach ($coor as $footprint) {
-                $qlookQuery = $footprint->getQlook()->where(['between', 'date', $this->startDate, $this->endDate]);
-                $qlooks = $qlookQuery->andWhere(['like','type','KazEOSat-1'])->all();
-                foreach($qlooks as $image){
-                    $qlook[] = ['cid'=>$image['name'],'date'=>$image['date'],'url'=>$image['url'],'Satellite'=>'KazEOSat-1',
-                                'X'=>[$footprint['NW_lng'],$footprint['NE_lng'],$footprint['SE_lng'],$footprint['SW_lng']],
-                                'Y'=>[$footprint['NW_lat'],$footprint['NE_lat'],$footprint['SE_lat'],$footprint['SW_lat']],
-                                'cloud'=>$image['cloud'],'angle'=>$image['angle']];
-                }
-            }
+            $coor = Coordinates::find()->innerJoinWith('qlook')
+                ->where(['and',['between', 'qlook.date', $this->startDate, $this->endDate],['like','type','KazEOSat-1']])
+                ->andWhere(['<=','SW_lat',$this->top])
+                ->andWhere(['>=','NE_lat',$this->bottom])
+                ->andWhere(['>=','NE_lng',$this->left])
+                ->andWhere(['<=','SW_lng',$this->right])
+                ->all();
+            /**/
         } elseif($this->MR && !$this->HR) {
-            foreach ($coor as $footprint) {
-                $qlookQuery = $footprint->getQlook()->where(['between', 'date', $this->startDate, $this->endDate]);
-                $qlooks = $qlookQuery->andWhere(['like','type','KazEOSat-2'])->all();
-                foreach($qlooks as $image){
-                    $qlook[] = ['cid'=>$image['name'],'date'=>$image['date'],'url'=>$image['url'],'Satellite'=>'KazEOSat-2',
-                        'X'=>[$footprint['NW_lng'],$footprint['NE_lng'],$footprint['SE_lng'],$footprint['SW_lng']],
-                        'Y'=>[$footprint['NW_lat'],$footprint['NE_lat'],$footprint['SE_lat'],$footprint['SW_lat']],
-                        'cloud'=>$image['cloud'],'angle'=>$image['angle']];
-                }
-            }
-        } elseif($this->MR && $this->HR) {
-            foreach ($coor as $footprint) {
-                $qlooks = $footprint->getQlook()->where(['between', 'date', $this->startDate, $this->endDate])->all();
-                foreach($qlooks as $image){
-                    $qlook[] = ['cid'=>$image['name'],'date'=>$image['date'],'url'=>$image['url'],'Satellite'=>$image['type'],
-                        'X'=>[$footprint['NW_lng'],$footprint['NE_lng'],$footprint['SE_lng'],$footprint['SW_lng']],
-                        'Y'=>[$footprint['NW_lat'],$footprint['NE_lat'],$footprint['SE_lat'],$footprint['SW_lat']],
-                        'cloud'=>$image['cloud'],'angle'=>$image['angle']];
-                }
+            $coor = Coordinates::find()->innerJoinWith('qlook')
+                ->where(['and',['between', 'qlook.date', $this->startDate, $this->endDate],['like','type','KazEOSat-2']])
+                ->andWhere(['<=','SW_lat',$this->top])
+                ->andWhere(['>=','NE_lat',$this->bottom])
+                ->andWhere(['>=','NE_lng',$this->left])
+                ->andWhere(['<=','SW_lng',$this->right])
+                ->all();
+        } else {
+            $coor = Coordinates::find()->innerJoinWith('qlook')
+                ->where(['between', 'qlook.date', $this->startDate, $this->endDate])
+                ->andWhere(['<=','SW_lat',$this->top])
+                ->andWhere(['>=','NE_lat',$this->bottom])
+                ->andWhere(['>=','NE_lng',$this->left])
+                ->andWhere(['<=','SW_lng',$this->right])
+                ->all();
+        }
+        //print_r($coor);
+        foreach ($coor as $footprint) {
+            $qlooks = $footprint->qlook;
+            foreach($qlooks as $image){
+                $qlook[] = ['cid'=>$image['name'],'date'=>$image['date'],'url'=>$image['url'],'Satellite'=>$image['type'],
+                    'X'=>[$footprint['NW_lng'],$footprint['NE_lng'],$footprint['SE_lng'],$footprint['SW_lng']],
+                    'Y'=>[$footprint['NW_lat'],$footprint['NE_lat'],$footprint['SE_lat'],$footprint['SW_lat']],
+                    'cloud'=>$image['cloud'],'angle'=>$image['angle']];
             }
         }
-        //
         return $qlook;
     }
 
     public function formShape($qlooks){
-        $text = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n";
-        $text = $text."<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n";
-        $text = $text."<Document>\n\t";
-        $text = $text."<name>KGS_base</name>\n\t";
-       /* $text = $text."<Style>\n\t\t";
-        $text = $text."<LineStyle>\n\t\t\t<color>ffff6600</color>\n\t\t\t<width>2</width>\n\t\t</LineStyle>\n\t\t";
-        $text = $text."<PolyStyle>\n\t\t\t<color>00000000</color>\n\t\t</PolyStyle>\n\t</Style>\n\t";*/
+        $fname = date_timestamp_get(date_create());
+        $fname = '../tmp/'.$fname.'.kml';
+        $fd = fopen($fname,'w');
+        fwrite($fd,"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        fwrite($fd,"<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
+        fwrite($fd,"<Document>\n\t");
+        fwrite($fd,"<name>KGS_base</name>\n\t");
         foreach($qlooks as $qlook) {
-            $text = $text . "<Placemark>\n\t\t<name>".$qlook['cid']."</name>\n\t\t";
-            $text = $text . "<description>\n\t\t\t<![CDATA[\n\t\t\t\t";
-            $text = $text . "<p><a href=\"".$qlook['url']."\">".$qlook['cid']."</a></p>\n\t\t\t";
-            $text = $text . "<p>cloudiness: ".$qlook['cloud']. " </p>\n\t\t\t";
-            $text = $text . "<p>angle: ".$qlook['angle']. " </p>\n\t\t\t";
-            $text = $text . "]]>\n\t\t</description>";
-            $text = $text . "<Polygon>\n\t\t\t<outerBoundaryIs>\n\t\t\t\t<LinearRing>\n\t\t\t\t\t<coordinates>\n\t\t\t\t\t\t";
+            fwrite($fd, "<Placemark>\n\t\t<name>".$qlook['cid']."</name>\n\t\t");
+            fwrite($fd,"<description>\n\t\t\t<![CDATA[\n\t\t\t\t");
+            fwrite($fd,"<p><a href=\"".$qlook['url']."\">".$qlook['cid']."</a></p>\n\t\t\t");
+            fwrite($fd,"<p>cloudiness: ".$qlook['cloud']. " </p>\n\t\t\t");
+            fwrite($fd, "<p>angle: ".$qlook['angle']. " </p>\n\t\t\t");
+            fwrite($fd,"]]>\n\t\t</description>");
+            fwrite($fd,"<Polygon>\n\t\t\t<outerBoundaryIs>\n\t\t\t\t<LinearRing>\n\t\t\t\t\t<coordinates>\n\t\t\t\t\t\t");
             foreach($qlook['X'] as $key=>$value){
-                $text = $text . $value . "," . $qlook['Y'][$key] . ",0 ";
+                fwrite($fd,$value . "," . $qlook['Y'][$key] . ",0 ");
             }
-            $text = $text . $qlook['X'][0] . "," . $qlook['Y'][0] . ",0 \n\t\t\t\t\t";
-            $text = $text . "</coordinates>\n\t\t\t\t</LinearRing>\n\t\t\t</outerBoundaryIs>\n\t\t</Polygon>\n\t</Placemark>\n";
+            fwrite($fd, $qlook['X'][0] . "," . $qlook['Y'][0] . ",0 \n\t\t\t\t\t");
+            fwrite($fd, "</coordinates>\n\t\t\t\t</LinearRing>\n\t\t\t</outerBoundaryIs>\n\t\t</Polygon>\n\t</Placemark>\n\t");
         }
-        $text = $text . "</Document>\n</kml>\n";
-        return $text;
+        fwrite($fd, "</Document>\n</kml>\n");
+        fclose($fd);
+        return $fname;
     }
 
 }

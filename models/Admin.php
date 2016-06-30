@@ -17,7 +17,7 @@ class Admin extends Model
 {
     public $startDate = '2014-07-15';
     public $endDate;
-    public $top = 70, $bottom = -70, $left = -180, $right = 180;
+    public $top = 85, $bottom = -85, $left = -180, $right = 180;
     public $HR = true, $MR = false;
     /*public $images;
     public $footprints;*/
@@ -80,16 +80,18 @@ class Admin extends Model
         $ch = curl_init();
         $abc = "7|0|14|http://cof2.gharysh.kz/customer-office/net.eads.astrium.faceo.HomePage/|F5D7A83DB22C52A50C21C05DB8965B9A|net.eads.astrium.faceo.middleware.gwt.client.ICatalogueGWTService|queryCatalogueSetRecords|net.eads.astrium.faceo.core.apis.catalogue.CatalogueSetRecordQuery/112575587|net.eads.astrium.faceo.core.apis.common.request.Criteria/4096422861|net.eads.astrium.faceo.core.apis.catalogue.CatalogueRecordQuery/3099495460|java.util.ArrayList/4159755760|net.eads.astrium.faceo.common.data.geographical.Box/1707532656|net.eads.astrium.faceo.common.data.geographical.GeoPosition/3149863295|EPSG:4326|net.eads.astrium.faceo.common.data.temporal.Period/2004917229|java.util.Date/3385151746|java.lang.Integer/3438268394|1|2|3|4|2|5|6|5|7|8|1|9|10|0|".$this->bottom."|".$this->left."|10|0|".$this->top."|".$this->right."|0|11|1|8|0|1000|8|1|12|13|".$endCode."|13|".$startCode."|8|1|14|0|0|0|6|0|0|0|";
         //$abc = "7|0|14|http://cof1.gharysh.kz/customer-office/net.eads.astrium.faceo.HomePage/|F5D7A83DB22C52A50C21C05DB8965B9A|net.eads.astrium.faceo.middleware.gwt.client.ICatalogueGWTService|queryCatalogueSetRecords|net.eads.astrium.faceo.core.apis.catalogue.CatalogueSetRecordQuery/112575587|net.eads.astrium.faceo.core.apis.common.request.Criteria/4096422861|net.eads.astrium.faceo.core.apis.catalogue.CatalogueRecordQuery/3099495460|java.util.ArrayList/4159755760|net.eads.astrium.faceo.common.data.geographical.Box/1707532656|net.eads.astrium.faceo.common.data.geographical.GeoPosition/3149863295|EPSG:4326|net.eads.astrium.faceo.common.data.temporal.Period/2004917229|java.util.Date/3385151746|java.lang.Integer/3438268394|1|2|3|4|2|5|6|5|7|8|1|9|10|0|".$this->top."|".$this->right."|10|0|".$this->bottom."|".$this->left."|0|11|1|8|0|1000|8|1|12|13|".$endCode."|13|".$startCode."|8|1|14|0|0|0|6|0|0|0|";
-        curl_setopt($ch, CURLOPT_URL,            "http://cof2.gharysh.kz/customer-office/net.eads.astrium.faceo.HomePage/catalogueService.rpc" );
+        curl_setopt($ch, CURLOPT_URL,            "http://89.218.69.35/customer-office/net.eads.astrium.faceo.HomePage/catalogueService.rpc" );
         // curl_setopt($ch, CURLOPT_URL,            "http://quickjson.com/generate/627604aecc6d" );
         // curl_setopt ($ch, CURLOPT_PORT , 81);
-        // curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
+        //curl_setopt($ch, CURLOPT_IPRESOLVE, CURL_IPRESOLVE_V4 );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1 );
         curl_setopt($ch, CURLOPT_POST,           1 );
         curl_setopt($ch, CURLOPT_POSTFIELDS,     $abc);
         curl_setopt($ch, CURLOPT_HTTPHEADER,     array('Content-Type: text/x-gwt-rpc; charset=UTF-8'));
+	//curl_setopt($ch, CURLOPT_DNS_USE_GLOBAL_CACHE, false );
+	//curl_setopt($ch, CURLOPT_DNS_CACHE_TIMEOUT, 2 );
         $result = curl_exec ($ch);
-      //  echo $result;
+        //echo $result;
         if($result === false)
         {
             echo '?????? curl: ' . curl_error($ch);

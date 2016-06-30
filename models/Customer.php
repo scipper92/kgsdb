@@ -16,7 +16,7 @@ use app\models\Coordinates;
 class Customer extends Model
 {   public $startDate = '2014-07-15';
     public $endDate;
-    public $top = 70, $bottom = -70, $left = -180, $right = 180;
+    public $top = 85, $bottom = -85, $left = -180, $right = 180;
     public $HR, $MR;
 
     public function rules(){

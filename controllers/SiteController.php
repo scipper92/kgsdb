@@ -9,6 +9,7 @@ use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
 use app\models\User;
+use yii\helpers\Url;
 
 class SiteController extends Controller
 {
@@ -54,9 +55,11 @@ class SiteController extends Controller
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             if($model->getUser()->getId() == 100)
-                return $this->goBack('admin/index');
+				$next = Url::toRoute('admin/index');
             else
-                return $this->goBack('customer/index');
+				$next = Url::toRoute('customer/index');
+			echo $next;
+			return $this->redirect($next);
         }
         return $this->render('login', [
             'model' => $model,

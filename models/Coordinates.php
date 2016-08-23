@@ -80,4 +80,12 @@ class Coordinates extends \yii\db\ActiveRecord
     {
         return 2*asin(sqrt($this->Haversine($B['lat']-$A['lat'])+cos($A['lat'])*cos($B['lat'])*$this->Haversine($B['lng'] - $A['lng'])));
     }
+
+    // width of footprint
+    public function getWidth()
+    {
+        $A = array('lat' => deg2rad($this->NW_lat),'lng' => deg2rad($this->NW_lng));
+        $B = array('lat' => deg2rad($this->NE_lat),'lng' => deg2rad($this->NE_lng));
+        return $this->rEarth(($A['lat']+$B['lat'])/2)*$this->dist($A,$B);
+    }
 }

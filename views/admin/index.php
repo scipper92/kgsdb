@@ -49,6 +49,8 @@ use yii\jui\DatePicker;
         <div class="form-group">
            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
             <br> <br>
+            <?= Html::a('Update angle', Url::toRoute('admin/update-angle') ) ?>
+            <br> <br>
             <?= Html::a('Update URL', Url::toRoute('admin/update-url') ) ?>
         </div>
     <?php ActiveForm::end(); ?>

@@ -416,4 +416,32 @@ class Admin extends Model
         //$qlook = new Qlook();
         //$qlook -> attributes = $image;
     }
+
+    public function updateAngle(){
+        foreach(Coordinates::find()->innerJoinWith('qlook')->where(['between', 'qlook.date', $this->startDate, $this->endDate])->each() as $coor) {
+            $qlooks = $coor->qlook;
+            if($qlooks[0]['type'] == "KazEOSat-1"){
+                $l = 10;
+                $h = 757;
+                $max_roll = 35;
+            } elseif($qlooks[0]['type'] == "KazEOSat-2"){
+                $l = 37;
+                $h = 630;
+                $max_roll = 30;
+            } // can be added other sattelites
+            $w = $coor->getWidth();
+            $roll = min(0.5*rad2deg(acos((4*$l*$h*$h/$w-$h*$h+$l*$l)/($h*$h+$l*$l))),$max_roll);
+            $transaction = Qlook::getDb()->beginTransaction();
+            try {
+                foreach ($qlooks as $qlook){
+                    $qlook['angle'] = $roll;
+                    $qlook->update();
+                }
+                $transaction->commit();
+            } catch(\Exception $e) {
+                $transaction->rollBack();
+                throw $e;
+            }
+        }
+    }
 }

@@ -38,4 +38,13 @@ class AdminController extends \yii\web\Controller
         return $this->render('index',['model' => $model]);
     }
 
+    public function actionUpdateAngle(){
+        $model = new Admin;
+        if( $model->load(\Yii::$app->request->post()) && $model->validate()){
+            $model->updateAngle();
+            //$model->addRecords();
+        }
+        return $this->render('index',['model' => $model]);
+    }
+
 }

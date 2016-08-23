@@ -59,4 +59,25 @@ class Coordinates extends \yii\db\ActiveRecord
     public function getQlook(){
         return $this->hasMany(Qlook::className(),['footprint_id'=>'id']);
     }
+
+    private function Haversine($x)
+    {
+        return (1-cos($x))/2.;
+    }
+
+    // Average Earth radius in $fi latitude
+    private function rEarth($fi)
+    {
+        $f = 298.257223563;
+        $e1 = (2-1/$f)/$f;
+        $a = 6378.137;
+        return $a*sqrt(1-$e1)/(1-$e1*$this->Haversine(2*$fi));
+
+    }
+
+    // Angle distance between A and B
+    private function dist($A,$B)
+    {
+        return 2*asin(sqrt($this->Haversine($B['lat']-$A['lat'])+cos($A['lat'])*cos($B['lat'])*$this->Haversine($B['lng'] - $A['lng'])));
+    }
 }

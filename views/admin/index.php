@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 use yii\jui\DatePicker;
 
@@ -46,7 +47,9 @@ use yii\jui\DatePicker;
     <br>
 
         <div class="form-group">
-            <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+           <?= Html::submitButton('Submit', ['class' => 'btn btn-primary']) ?>
+            <br> <br>
+            <?= Html::a('Update URL', Url::toRoute('admin/update-url') ) ?>
         </div>
     <?php ActiveForm::end(); ?>
 

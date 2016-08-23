@@ -124,7 +124,8 @@ class Admin extends Model
             $image['name'] = substr($tmp,1,43);
             $image['date'] = substr(explode("beginPosition",$arrGmd[112],2)[1],1,10);
             $tmp = explode(',',$arrGmd[$n-1]);
-            $image['url'] = substr($tmp[count($tmp)-13],1,88);
+            $url = substr($tmp[count($tmp)-13],1,88);
+            $image['url'] = $url."?key=".md5($url."p0sUe");
             $tmp = substr(explode("gco:CharacterString>",$arrGmd[77])[1],0,-3);
             $tmp = explode(' ',$tmp);
             sscanf($tmp[0],"%f",$lng);
@@ -163,7 +164,8 @@ class Admin extends Model
             $image['name'] = substr($tmp,1,18);
             $image['date'] = substr(explode("DateTime",$arrGmd[39],2)[1],1,10);
             $tmp = explode(',',$arrGmd[$n-1]);
-            $image['url'] = substr($tmp[count($tmp)-13],1,64);
+            $url = substr($tmp[count($tmp)-13],1,63);
+            $image['url'] = $url."?key=".md5($url."p0sUe");
             $tmp = substr(explode("gco:CharacterString>",$arrGmd[72])[1],0,-3);
             $tmp = explode(' ',$tmp);
             sscanf($tmp[0],"%f",$lng);
@@ -208,7 +210,8 @@ class Admin extends Model
                 $image['name'] = substr($tmp,1,43);
                 $image['date'] = substr(explode("beginPosition",$arrGmd[112],2)[1],1,10);
                 $tmp = explode(',',$arrGmd[$n-1]);
-                $image['url'] = substr($tmp[count($tmp)-3],1,88);
+                $url = substr($tmp[count($tmp)-3],1,88);
+                $image['url'] = $url."?key=".md5($url."p0sUe");
                 $tmp = substr(explode("gco:CharacterString>",$arrGmd[77])[1],0,-3);
                 $tmp = explode(' ',$tmp);
                 sscanf($tmp[0],"%f",$lng);
@@ -247,7 +250,8 @@ class Admin extends Model
                 $image['name'] = substr($tmp,1,18);
                 $image['date'] = substr(explode("DateTime",$arrGmd[39],2)[1],1,10);
                 $tmp = explode(',',$arrGmd[$n-1]);
-                $image['url'] = substr($tmp[count($tmp)-3],1,64);
+                $url = substr($tmp[count($tmp)-3],1,63);
+                $image['url'] = $url."?key=".md5($url."p0sUe");
                 $tmp = substr(explode("gco:CharacterString>",$arrGmd[72])[1],0,-3);
                 $tmp = explode(' ',$tmp);
                 sscanf($tmp[0],"%f",$lng);
@@ -292,7 +296,8 @@ class Admin extends Model
             $image['name'] = substr($tmp,1,43);
             $image['date'] = substr(explode("beginPosition",$arrGmd[112],2)[1],1,10);
             $tmp = explode(',',$arrGmd[$n-1]);
-            $image['url'] = substr($tmp[count($tmp)-2],1,88);
+            $url = substr($tmp[count($tmp)-2],1,88);
+            $image['url'] = $url."?key=".md5($url."p0sUe");
             $tmp = substr(explode("gco:CharacterString>",$arrGmd[77])[1],0,-3);
             $tmp = explode(' ',$tmp);
             sscanf($tmp[0],"%f",$lng);
@@ -329,7 +334,8 @@ class Admin extends Model
             $image['name'] = substr($tmp, 1, 18);
             $image['date'] = substr(explode("DateTime", $arrGmd[39], 2)[1], 1, 10);
             $tmp = explode(',', $arrGmd[$n - 1]);
-            $image['url'] = substr($tmp[count($tmp) - 2], 1, 64);
+            $url = substr($tmp[count($tmp) - 2], 1, 63);
+            $image['url'] = $url."?key=".md5($url."p0sUe");
             $tmp = substr(explode("gco:CharacterString>", $arrGmd[72])[1], 0, -3);
             $tmp = explode(' ', $tmp);
             sscanf($tmp[0],"%f",$lng);

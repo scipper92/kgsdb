@@ -85,6 +85,7 @@ class Customer extends Model
             fwrite($fd, "<Placemark>\n\t\t<name>".$qlook['cid']."</name>\n\t\t");
             fwrite($fd,"<description>\n\t\t\t<![CDATA[\n\t\t\t\t");
             fwrite($fd,"<p><a href=\"".$qlook['url']."\">".$qlook['cid']."</a></p>\n\t\t\t");
+			fwrite($fd,"<p>date: ".$qlook['date']. " </p>\n\t\t\t");
             fwrite($fd,"<p>cloudiness: ".$qlook['cloud']. " </p>\n\t\t\t");
             fwrite($fd, "<p>angle: ".$qlook['angle']. " </p>\n\t\t\t");
             fwrite($fd,"]]>\n\t\t</description>");

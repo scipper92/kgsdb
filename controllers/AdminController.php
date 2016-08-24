@@ -11,6 +11,7 @@ class AdminController extends \yii\web\Controller
     {   $model = new Admin;
         if( $model->load(\Yii::$app->request->post()) && $model->validate()){
             $model->callCof();
+            $model->updateAngle();
             //$model->addRecords();
         }
         return $this->render('index',['model' => $model]);

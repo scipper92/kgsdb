@@ -39,10 +39,10 @@ class Admin extends Model
         if($edge == 'A')
             $b = 1012500;
         else
-            $b = 2362499;
+            $b = 1012499;
         $zero = date_create("1970-01-01");
         $y = date_diff($zero,$date);
-        $y = $y->format("%a")-1;
+        $y = $y->format("%a");
         $x = $a * $y + $b;
         $mask = 64**5;
         $code ='';
@@ -425,7 +425,7 @@ class Admin extends Model
                 $h = 757;
                 $max_roll = 35;
             } elseif($qlooks[0]['type'] == "KazEOSat-2"){
-                $l = 37;
+                $l = 38;
                 $h = 630;
                 $max_roll = 30;
             } // can be added other sattelites

@@ -54,7 +54,7 @@ class SiteController extends Controller
         //return $this->render('index');
         $model = new LoginForm();
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
-            if($model->getUser()->getId() == 100)
+            if($model->getUser()->getId() == 1)
 				$next = Url::toRoute('admin/index');
             else
 				$next = Url::toRoute('customer/index');

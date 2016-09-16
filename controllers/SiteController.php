@@ -8,6 +8,7 @@ use yii\web\Controller;
 use yii\filters\VerbFilter;
 use app\models\LoginForm;
 use app\models\ContactForm;
+use app\models\SignupForm;
 use app\models\User;
 use yii\helpers\Url;
 
@@ -58,7 +59,7 @@ class SiteController extends Controller
 				$next = Url::toRoute('admin/index');
             else
 				$next = Url::toRoute('customer/index');
-			echo $next;
+			//echo $next;
 			return $this->redirect($next);
         }
         return $this->render('login', [
@@ -97,6 +98,19 @@ class SiteController extends Controller
             return $this->refresh();
         }
         return $this->render('contact', [
+            'model' => $model,
+        ]);
+    }
+
+    public function actionSignup()
+    {
+        $model = new SignupForm();
+        if ($model->load(Yii::$app->request->post()) && $model->insertContacts()) {
+            Yii::$app->session->setFlash('contactFormSubmitted');
+
+            return $this->goHome();
+        }
+        return $this->render('signup', [
             'model' => $model,
         ]);
     }

@@ -5,6 +5,15 @@ namespace app\models;
 use yii\db\ActiveRecord;
 use yii\web\IdentityInterface;
 
+/**
+ * This is the model class for table "user".
+ *
+ * @property string $id
+ * @property string $username
+ * @property string $password
+ * @property string $token
+ */
+
 class User extends ActiveRecord implements IdentityInterface
 {/*
     public $id;
@@ -36,6 +45,23 @@ class User extends ActiveRecord implements IdentityInterface
         return 'user';
     }
 
+    public function rules()
+    {
+        return [
+            [['username','password'], 'required'],
+            [['username','password','token'], 'string', 'max' => 50],
+        ];
+    }
+
+    public function attributeLabels()
+    {
+        return [
+            'id' => 'ID',
+            'username' => 'Username',
+            'password' => 'Password',
+            'token' => 'Token'
+        ];
+    }
     /**
      * @inheritdoc
      */
@@ -109,5 +135,9 @@ class User extends ActiveRecord implements IdentityInterface
     public function validatePassword($password)
     {
         return $this->password === $password;
+    }
+
+    public function getContacts(){
+        return $this->hasOne(Contacts::className(),['uid' => 'id']);
     }
 }

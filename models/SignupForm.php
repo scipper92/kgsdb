@@ -104,7 +104,9 @@ class SignupForm extends Model
             .$user->username."\npassword: "
             .$user->password
             ."\n\rPlease, don't share them with other persons.\n\rBest regards,\n\rKGS.";
-        $this->contact(Yii::$app->params['adminEmail'],$subject,$body);
+        $email = Yii::$app->params['adminEmail'];
+        //$email = 'jakypovabylai@gmail.com';
+        $this->contact($email,$subject,$body);
         return true;
     }
 }

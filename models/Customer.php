@@ -73,9 +73,50 @@ class Customer extends Model
         return $qlook;
     }
 
+    public function queryBaseExt($opt){
+        $qlook = [];
+        if($opt->HR && !$opt->MR) {
+            $coor = Coordinates::find()->innerJoinWith('qlook')
+                ->where(['and',['between', 'qlook.date', $opt->startDate, $opt->endDate],['like','type','KazEOSat-1']])
+                ->andWhere(['<=','SW_lat',$opt->top])
+                ->andWhere(['>=','NE_lat',$opt->bottom])
+                ->andWhere(['>=','NE_lng',$opt->left])
+                ->andWhere(['<=','SW_lng',$opt->right])
+                ->all();
+            /**/
+        } elseif($opt->MR && !$opt->HR) {
+            $coor = Coordinates::find()->innerJoinWith('qlook')
+                ->where(['and',['between', 'qlook.date', $opt->startDate, $opt->endDate],['like','type','KazEOSat-2']])
+                ->andWhere(['<=','SW_lat',$opt->top])
+                ->andWhere(['>=','NE_lat',$opt->bottom])
+                ->andWhere(['>=','NE_lng',$opt->left])
+                ->andWhere(['<=','SW_lng',$opt->right])
+                ->all();
+        } else {
+            $coor = Coordinates::find()->innerJoinWith('qlook')
+                ->where(['between', 'qlook.date', $opt->startDate, $opt->endDate])
+                ->andWhere(['<=','SW_lat',$opt->top])
+                ->andWhere(['>=','NE_lat',$opt->bottom])
+                ->andWhere(['>=','NE_lng',$opt->left])
+                ->andWhere(['<=','SW_lng',$opt->right])
+                ->all();
+        }
+        //print_r($coor);
+        foreach ($coor as $footprint) {
+            $qlooks = $footprint->qlook;
+            foreach($qlooks as $image){
+                $qlook[] = ['cid'=>$image['name'],'date'=>$image['date'],'url'=>$image['url'],'Satellite'=>$image['type'],
+                    'X'=>[$footprint['NW_lng'],$footprint['NE_lng'],$footprint['SE_lng'],$footprint['SW_lng']],
+                    'Y'=>[$footprint['NW_lat'],$footprint['NE_lat'],$footprint['SE_lat'],$footprint['SW_lat']],
+                    'cloud'=>$image['cloud'],'angle'=>$image['angle']];
+            }
+        }
+        return $qlook;
+    }
+
     public function formShape($qlooks){
         $fname = date_timestamp_get(date_create());
-        $fname = '../tmp/'.$fname.'.kml';
+        $fname = './tmp/'.$fname.'.kml';
         $fd = fopen($fname,'w');
         fwrite($fd,"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         fwrite($fd,"<kml xmlns=\"http://www.opengis.net/kml/2.2\" xmlns:gx=\"http://www.google.com/kml/ext/2.2\" xmlns:kml=\"http://www.opengis.net/kml/2.2\" xmlns:atom=\"http://www.w3.org/2005/Atom\">\n");
@@ -99,6 +140,35 @@ class Customer extends Model
         fwrite($fd, "</Document>\n</kml>\n");
         fclose($fd);
         return $fname;
+    }
+
+    public function whiteArg($uid){
+        $fname = date_timestamp_get(date_create());
+        //$fname = '../commands/args/argv_'.$fname.'.json';
+        $fname = '../commands/args/argv_'.$fname.'.txt';
+        $fd = fopen($fname,'w');/*
+        $arg = array(
+                'uid' => $uid,
+                'HR' => $this->HR,
+                'MR' => $this->MR,
+                'startDate' => $this->startDate,
+                'endDate' => $this->endDate,
+                'top' => $this->top,
+                'bottom' => $this->bottom,
+                'left' => $this->left,
+                'right' => $this->right
+            );
+        fwrite($fd,json_encode($arg));*/
+        fwrite($fd,"uid: ".$uid."\n");
+        fwrite($fd,"HR: ".$this->HR."\n");
+        fwrite($fd,"MR: ".$this->MR."\n");
+        fwrite($fd,"startDate: ".$this->startDate."\n");
+        fwrite($fd,"endDate: ".$this->endDate."\n");
+        fwrite($fd,"top: ".$this->top."\n");
+        fwrite($fd,"bottom: ".$this->bottom."\n");
+        fwrite($fd,"left: ".$this->left."\n");
+        fwrite($fd,"right: ".$this->right);
+        fclose($fd);
     }
 
 }
